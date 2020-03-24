@@ -2,8 +2,9 @@
 
 ## Table of Contents:
 1. [You Did What?](#what)
-2. [Disclaimer](#disclaimer)
-3. [Instructions](#instructions)
+2. [Who Is This Guide Intended For?](#who)
+3. [Disclaimer](#disclaimer)
+4. [Instructions](#instructions)
 
 ## You Did What? <a name="what"></a>
 **Running any sort of Windows program on Linux is hard**. It's almost physically painful to configure Wine, and for every game or executable you want to run, there's always a bunch of different arguments or flags you have to set that are specific to that program. As a casual gamer who enjoys Linux, it's especially aggravating when you're thinking about buying a new machine. 
@@ -29,6 +30,10 @@ One solution is [PCI(e) passthrough](https://wiki.archlinux.org/index.php/PCI_pa
 
 After much researching and testing, I found a solution which utilizes PCI(e) passthrough with only one GPU and still provides near-native performance. This is a step-by-step guide on how to configure this for a Linux machine.
 
+## Who Is This Guide Intended For? <a name="who"></a>
+
+This guide is intended for Manjaro/Arch Linux users who would like to run Windows programs which require advanced GPU processing on their machine (i.e. Steam games or graphics intensive Windows programs). 
+
 ## Disclaimer <a name="disclaimer"></a>
 
 I hold no responsibility for damages done to your machine. This guide was tested on a machine with the following hardware and software:
@@ -43,11 +48,34 @@ I hold no responsibility for damages done to your machine. This guide was tested
 | Memory | G Skill Ripjaws 2x16Gb DDR4-3200 |
 | SSD | SamsungEvo 1TB Nvme M.2 |
 
-With that in mind, **make sure you understand exactly what is happening before following a step**, so you don't damage your machine. 
+
+With that in mind, **make sure you understand exactly what is happening before following any step**, so you don't damage your machine. 
 
 I'm also using an [Arch Linux](https://www.archlinux.org/)-based distribution, so I will be using [Pacman](https://wiki.archlinux.org/index.php/pacman) and [yay](https://github.com/Jguer/yay) to retrieve packages.
 
 ## Instructions <a name="instructions"></a>
 
-**WIP**
+1. Virtualization needs to be enabled before anything. You won't be able to run a virtual machine without it. To enable virtualization in the kernel, you will need to change your BIOS settings to enable virtualization. Each BIOS has different settings. You can verify virtualization is enabled by running `egrep "svm|vmx" /proc/cpuinfo`. If the command outputs a list of flags, virtualization is enabled.
 
+2. Install `libvirt` and `virt-manager`. `libvirt` is a virtualization API designed to make it easier to created a virtual machine, and `virt-manager provides a simple GUI to manage virtualization.
+    ```
+    sudo pacman -S libvirt virt-manager
+    ```
+    Enable the `libvirtd` system daemon.
+    ```
+    sudo systemctl start libvirtd
+    ```
+3. You'll need to download a Windows 10 disc image. Microsoft provides a [free download](https://www.microsoft.com/en-us/software-download/windows10ISO), but you'll need an activation key.
+    Then move the image to the `libvirt` `images` directory.
+    ```
+    sudo mv ~/Downloads/Win10_1909_English_x64.iso /var/lib/libvirt/images/
+    ```
+4. Start the virtualization manager.
+    ```
+    virt-manager
+    ```
+    Create a new virtual machine with local install media, then choose the downloaded disc image.
+5. Choose the amount of memory and CPU cores you would like to use. I would recommend anything higher than 8Gb (8192Mb) for memory, and 2-4 CPU cores. With my hardware, I chose 12Gb (12288Mb) and 4 CPUs.
+6. Choose the amount of storage space you need. This will vary depending on your use cases. Since I don't necessarily have gaming as a high priority right now, I chose 100Gb. Check `Customize configuration before install`, then `finish`. It will likely prompt if you would like to start the virtual network. Say `yes`.
+
+**WIP**
