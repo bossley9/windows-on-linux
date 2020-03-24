@@ -34,7 +34,7 @@ After much researching and testing, I found a solution which utilizes PCI(e) pas
 I hold no responsibility for damages done to your machine. This guide was tested on a machine with the following hardware and software:
 
 | | |
-| --- | --- |
+| :--- | :--- |
 | Operating System | Manjaro Linux 19.0.2 Kyria |
 | Kernel | 5.4.24-1-MANJARO |
 | Motherboard | Msi B450 Pro Carbon AC |
