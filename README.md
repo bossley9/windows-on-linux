@@ -1,10 +1,14 @@
 # Windows on Linux
 
 ## Table of Contents:
-1. [You Did What?](#what)
-2. [Who Is This Guide Intended For?](#who)
+1. [Who Is This Guide Intended For?](#who)
+2. [You Did What?](#what)
 3. [Disclaimer](#disclaimer)
 4. [Instructions](#instructions)
+
+## Who Is This Guide Intended For? <a name="who"></a>
+
+This guide is intended for Manjaro/Arch Linux users who would like to run Windows programs which require advanced GPU processing on their machine (i.e. Steam games or graphics intensive Windows programs). 
 
 ## You Did What? <a name="what"></a>
 **Running any sort of Windows program on Linux is hard**. It's almost physically painful to configure Wine, and for every game or executable you want to run, there's always a bunch of different arguments or flags you have to set that are specific to that program. As a casual gamer who enjoys Linux, it's especially aggravating when you're thinking about buying a new machine. 
@@ -29,10 +33,6 @@ This is something I couldn't compromise on. My work uses [Unreal Engine 4](https
 One solution is [PCI(e) passthrough](https://wiki.archlinux.org/index.php/PCI_passthrough_via_OVMF). Essentially, the virtual machine uses a secondary hardware GPU and passes it to the guest, which uses it to produce near-native performance. The only problem was that my Linux machine did not have two GPUs, and I refused to spend the money to buy another GPU just for Windows programs.
 
 After much researching and testing, I found a solution which utilizes PCI(e) passthrough with only one GPU and still provides near-native performance. This is a step-by-step guide on how to configure this for a Linux machine.
-
-## Who Is This Guide Intended For? <a name="who"></a>
-
-This guide is intended for Manjaro/Arch Linux users who would like to run Windows programs which require advanced GPU processing on their machine (i.e. Steam games or graphics intensive Windows programs). 
 
 ## Disclaimer <a name="disclaimer"></a>
 
