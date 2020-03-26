@@ -1,4 +1,5 @@
 # Windows on Linux
+Single GPU PCI(e) passthrough
 
 ## Table of Contents:
 1. [Who Is This Guide Intended For?](#who)
@@ -42,6 +43,7 @@ I hold no responsibility for damages done to your machine. This guide was tested
 | :--- | :--- |
 | Operating System | Manjaro Linux 19.0.2 Kyria |
 | Kernel | 5.4.24-1-MANJARO |
+| Window Manager | Gnome |
 | Motherboard | Msi B450 Pro Carbon AC |
 | CPU | AMD Ryzen 9 3900X |
 | GPU | AMD Radeon RX 580 |
@@ -57,25 +59,28 @@ I'm also using an [Arch Linux](https://www.archlinux.org/)-based distribution, s
 
 1. Virtualization needs to be enabled before anything. You won't be able to run a virtual machine without it. To enable virtualization in the kernel, you will need to change your BIOS settings to enable virtualization. Each BIOS has different settings. You can verify virtualization is enabled by running `egrep "svm|vmx" /proc/cpuinfo`. If the command outputs a list of flags, virtualization is enabled.
 
-2. Install `libvirt` and `virt-manager`. `libvirt` is a virtualization API designed to make it easier to created a virtual machine, and `virt-manager provides a simple GUI to manage virtualization.
+2. Install `qemu`, `ovmf`, and `libvirt`.
     ```
-    sudo pacman -S libvirt virt-manager
+    sudo pacman -S qemu ovmf libvirt
     ```
-    Enable the `libvirtd` system daemon.
-    ```
-    sudo systemctl start libvirtd
-    ```
-3. You'll need to download a Windows 10 disc image. Microsoft provides a [free download](https://www.microsoft.com/en-us/software-download/windows10ISO), but you'll need an activation key.
-    Then move the image to the `libvirt` `images` directory.
-    ```
-    sudo mv ~/Downloads/Win10_1909_English_x64.iso /var/lib/libvirt/images/
-    ```
-4. Start the virtualization manager.
-    ```
-    virt-manager
-    ```
-    Create a new virtual machine with local install media, then choose the downloaded disc image.
-5. Choose the amount of memory and CPU cores you would like to use. I would recommend anything higher than 8Gb (8192Mb) for memory, and 2-4 CPU cores. With my hardware, I chose 12Gb (12288Mb) and 4 CPUs.
-6. Choose the amount of storage space you need. This will vary depending on your use cases. Since I don't necessarily have gaming as a high priority right now, I chose 100Gb. Check `Customize configuration before install`, then `finish`. It will likely prompt if you would like to start the virtual network. Say `yes`.
+3. Enable IOMMU. Edit `/etc/default/grub` and add `amd_iommu=on` and `iommu=pt` to `GRUB_CMDLINE_LINUX_DEFAULT`. Note that these modules may be different depending on your architecture.
+	```
+	GRUB_CMDLINE_LINUX_DEFAULT="amd_iommu=on iommu=pt"
+	```
+	Then regenerate grub.
+	```
+	sudo grub-mkconfig -o /boot/grub/grub.cfg
+	```
+	Reboot. Verify that IOMMU works with `sudo dmesg | grep -e DMAR -e IOMMU`.
+4. You'll need to download a Windows 10 disc image. Microsoft provides a [free download](https://www.microsoft.com/en-us/software-download/windows10ISO), but you'll likely need an activation key.
+5. Start the `libvirt` daemon.
+	```
+	sudo systemctl start libvirtd
+	```
+6. Before you proceed past this step, **make sure** you have saved and closed every window before continuing.
+	Kill the display manager. This will vary depending on your display manager. This will kill X.
+	```
+	systemctl stop gdm
+	```
 
 **WIP**
