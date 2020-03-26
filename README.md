@@ -1,5 +1,7 @@
 # Windows on Linux
-Single GPU PCI(e) passthrough
+Single GPU PCI(e) passthrough for Windows 10 virtual machines
+
+> Note: This guide is still a work in progress and is not yet completed.
 
 ## Table of Contents:
 1. [Who Is This Guide Intended For?](#who)
@@ -63,6 +65,10 @@ I'm also using an [Arch Linux](https://www.archlinux.org/)-based distribution, s
     ```
     sudo pacman -S qemu ovmf libvirt
     ```
+    If the `ovmf` package is unavailable in all repositories (like it was for me), you can also install the AUR version:
+    ```
+    yay -S ovmf-git
+    ```
 3. Enable IOMMU. Edit `/etc/default/grub` and add `amd_iommu=on` and `iommu=pt` to `GRUB_CMDLINE_LINUX_DEFAULT`. Note that these modules may be different depending on your architecture.
 	```
 	GRUB_CMDLINE_LINUX_DEFAULT="amd_iommu=on iommu=pt"
@@ -77,6 +83,11 @@ I'm also using an [Arch Linux](https://www.archlinux.org/)-based distribution, s
 	```
 	sudo systemctl start libvirtd
 	```
+  You can verify this is running with `sudo systemctl status libvirtd`. If it says "Failed to initialize a valid firewall backend", you will need to install additional packages, then restart `libvirtd`.
+  ```
+  sudo pacman -Syu ebtables dnsmasq
+  sudo systemctl restart libvirtd
+  ```
 6. Before you proceed past this step, **make sure** you have saved and closed every window before continuing.
 	Kill the display manager. This will vary depending on your display manager. This will kill X.
 	```
