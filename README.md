@@ -1,5 +1,5 @@
 # Windows on Linux
-Single GPU PCI(e) passthrough for Windows 10 virtual machines
+A step-by-step guide for running a nearly native Windows 10 VM on Linux using Qemu, Libvirt and PCI(e)-passthrough with a single GPU
 
 > Note: This guide is still a work in progress and is not yet completed.
 
