@@ -70,28 +70,44 @@ I'm also using an [Arch Linux](https://www.archlinux.org/)-based distribution, s
     yay -S ovmf-git
     ```
 3. Enable IOMMU. Edit `/etc/default/grub` and add `amd_iommu=on` and `iommu=pt` to `GRUB_CMDLINE_LINUX_DEFAULT`. Note that these modules may be different depending on your architecture.
-	```
-	GRUB_CMDLINE_LINUX_DEFAULT="amd_iommu=on iommu=pt"
-	```
-	Then regenerate grub.
-	```
-	sudo grub-mkconfig -o /boot/grub/grub.cfg
-	```
-	Reboot. Verify that IOMMU works with `sudo dmesg | grep -e DMAR -e IOMMU`.
+	  ```
+	  GRUB_CMDLINE_LINUX_DEFAULT="amd_iommu=on iommu=pt"
+	  ```
+	  Then regenerate grub.
+	  ```
+	  sudo grub-mkconfig -o /boot/grub/grub.cfg
+	  ```
+	  Reboot. Verify that IOMMU works with `sudo dmesg | grep -e DMAR -e IOMMU`.
+    If you want to double check that IOMMU works, try running the `iommu.sh` script in this repository, which will show the different IOMMU groups if IOMMU is set up properly ([script source](https://wiki.archlinux.org/index.php/PCI_passthrough_via_OVMF#Prerequisites))
 4. You'll need to download a Windows 10 disc image. Microsoft provides a [free download](https://www.microsoft.com/en-us/software-download/windows10ISO), but you'll likely need an activation key.
 5. Start the `libvirt` daemon.
-	```
-	sudo systemctl start libvirtd
-	```
-  You can verify this is running with `sudo systemctl status libvirtd`. If it says "Failed to initialize a valid firewall backend", you will need to install additional packages, then restart `libvirtd`.
-  ```
-  sudo pacman -Syu ebtables dnsmasq
-  sudo systemctl restart libvirtd
-  ```
-6. Before you proceed past this step, **make sure** you have saved and closed every window before continuing.
-	Kill the display manager. This will vary depending on your display manager. This will kill X.
-	```
-	systemctl stop gdm
-	```
+  	```
+  	sudo systemctl start libvirtd
+  	```
+    You can verify this is running with `sudo systemctl status libvirtd`. If it says "Failed to initialize a valid firewall backend", you will need to install additional packages, then restart `libvirtd`.
+    ```
+    sudo pacman -Syu ebtables dnsmasq
+    sudo systemctl restart libvirtd
+    ```
+6. Next, you will need to get the ids of the gpu display and gpu audio. Run the following command, which will display input similar to mine.
+    ```
+    lspci -nnk | grep VGA -A 7
+
+    ----------------------------------------------------------------
+
+    26:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Ellesmere [Radeon RX 470/480/570/570X/580/580X/590] [1002:67df] (rev e7)
+      Subsystem: Tul Corporation / PowerColor Ellesmere [Radeon RX 470/480/570/570X/580/580X/590] [148c:2378]
+      Kernel driver in use: amdgpu
+      Kernel modules: amdgpu
+    26:00.1 Audio device [0403]: Advanced Micro Devices, Inc. [AMD/ATI] Ellesmere HDMI Audio [Radeon RX 470/480 / 570/580/590] [1002:aaf0]
+      Subsystem: Tul Corporation / PowerColor Ellesmere HDMI Audio [Radeon RX 470/480 / 570/580/590] [148c:aaf0]
+      Kernel driver in use: snd_hda_intel
+      Kernel modules: snd_hda_intel
+    ```
+7. Before you proceed past this step, **make sure** you have saved and closed every window before continuing.
+	  Kill the display manager. This will vary depending on your display manager. This will kill X.
+	  ```
+	  systemctl stop gdm
+    ```
 
 **WIP**
