@@ -1,7 +1,7 @@
 # Windows on Linux
 A step-by-step guide for running a nearly native Windows 10 VM on Linux using Qemu, Libvirt and PCI(e)-passthrough with a single GPU
 
-> Note: This guide is still a work in progress and is not yet completed.
+> Note: This guide is not completed, and due to school committments, will not be continued for some time. However, if you're looking for great resources on this topic, try the [Arch Wiki](https://wiki.archlinux.org/index.php/PCI_passthrough_via_OVMF#Using_identical_guest_and_host_GPUs). You can also take a look at [Pavolelsig's passthrough helper](https://github.com/pavolelsig/passthrough_helper_manjaro) and [Yuri Alek's guide](https://gitlab.com/YuriAlek/vfio).
 
 ## Table of Contents:
 1. [Who Is This Guide Intended For?](#who)
