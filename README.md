@@ -7,7 +7,6 @@ A step-by-step guide to playing games on a Windows 10 VM in Linux using PCI(e) p
 1. [About](#about)
 1. [Who Is This Guide Intended For?](#who)
 2. [Disclaimer](#disclaimer)
-3. [You Did What?](#what)
 4. [Instructions](#instructions)
 5. [Resources](#resources)
 
