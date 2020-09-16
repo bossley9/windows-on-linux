@@ -1,61 +1,59 @@
 # Windows on Linux
-A step-by-step guide for running a nearly native Windows 10 VM on Linux using Qemu, Libvirt and PCI(e)-passthrough with a single GPU
+A step-by-step guide to playing games on a Windows 10 VM in Linux using PCI(e) passthrough with a single GPU in Qemu
 
-> Note: This guide is not completed, and due to school committments, will not be continued for some time. However, if you're looking for great resources on this topic, try the [Arch Wiki](https://wiki.archlinux.org/index.php/PCI_passthrough_via_OVMF#Using_identical_guest_and_host_GPUs). You can also take a look at [Pavolelsig's passthrough helper](https://github.com/pavolelsig/passthrough_helper_manjaro) and [Yuri Alek's guide](https://gitlab.com/YuriAlek/vfio).
+> Note: This guide is not completed, and due to school committments, will not be completed for some time. I will work on finishing this whenever I can :)
 
 ## Table of Contents:
+1. [About](#about)
 1. [Who Is This Guide Intended For?](#who)
-2. [You Did What?](#what)
-3. [Disclaimer](#disclaimer)
+2. [Disclaimer](#disclaimer)
+3. [You Did What?](#what)
 4. [Instructions](#instructions)
+5. [Resources](#resources)
+
+## About <a name="about"></a>
+
+I think one of the biggest defenses of Windows 10 over various Linux distributions is that _"Windows 10 can run games and Linux can't."_
+
+Only normies would say this.
+
+Playing games on Linux is only as complicated as you make it to be. The purpose of this project is to prove to all the normies out there that playing games on Linux is doable, even if the gaming industry doesn't completely back support for Unix-based systems (and to work around things like anticheat). 
+
+> If you happen to be a Windows, macOS, or BSD user who has never touched Linux before, I suggest [trying Manjaro first](https://manjaro.org/downloads/official/gnome).
+
+#### Solutions
+
+First, there are many alternatives to gaming on Linux.
+
+1. Find [open source games built with support for Unix](https://www.gamingonlinux.com/itemdb.php). The only downside is that, well... the selection of games is extremely limited.
+2. Use a Windows DOS, Win32, or Windows executable runner like `Wine` or `DXVK`. Manually setting up Wine prefixes is a royal pain so I would suggest using an established client such as [GOG](https://www.gog.com/) or [Lutris](https://lutris.net/). Almost 99% of games can be found here.
+3. Run a virtual machine. A virtual machine is creating a simulated environment in which you can run an operating system within a "black box". The core issue with gaming on a virtual machine is that a GPU can only output graphics to a single monitor (i.e. if you send all of your graphics to a virtual machine, your computer won't be able to display your desktop and your screen will turn off.
+
+    A solution to this problem is single GPU [PCI(e) passthrough](https://wiki.archlinux.org/index.php/PCI_passthrough_via_OVMF), in which the kernal passes the GPU output immediately from the host machine to the guest machine (the VM). Since the previous solutions are trivial in setup, this guide will focus on configuring single GPU PCI(e) passthrough.
 
 ## Who Is This Guide Intended For? <a name="who"></a>
 
-This guide is intended for Manjaro/Arch Linux users who would like to run Windows programs which require advanced GPU processing on their machine (i.e. Steam games or graphics intensive Windows programs). 
-
-## You Did What? <a name="what"></a>
-**Running any sort of Windows program on Linux is hard**. It's almost physically painful to configure Wine, and for every game or executable you want to run, there's always a bunch of different arguments or flags you have to set that are specific to that program. As a casual gamer who enjoys Linux, it's especially aggravating when you're thinking about buying a new machine. 
-
-_Should I just stick with Windows?_  
-Of course you can - and sell your soul to Microsoft in the process. You've also just made any kind of software development or [ricing](https://www.reddit.com/r/unixporn/wiki/themeing/dictionary#wiki_rice) much more tedious and counter-productive. You might as well type code on a [Blackberry phone](https://blackberrymobile.com/us/).
-
-_Well, I guess I can just dual boot..._  
-Yes, and every time you need to run a Windows program or game, you can restart your computer. And then you accidentally forgot to fix a file in Linux so you need to restart again. Oops, you forgot to make a selection in the grub menu and it accidentally booted into the wrong boot option. Need I say any more?
-
-_Fine, fine, I'll stick with Linux._  
-No games for you.
-
-> Actually, I've been using [Lutris](https://lutris.net/) for the past three months to game on Linux and it has amazing ports from Windows gaming to Linux using preset options in Wine, Proton and PlayOnLinux. But it's not perfect.  
-
-And what if you need to run a program that doesn't work with Wine or Lutris, like [Visual Studio](https://visualstudio.microsoft.com/)? I encountered this very problem last month, which made me scramble to find a solution. Now that [COVID-19](https://en.wikipedia.org/wiki/Coronavirus_disease_2019) is forcing everyone to work remotely, I can't just use my work machine to run Visual Studio, and our remote desktop service has terrible performance. 
-
-So, of course, I chose to run a virtual machine. But there's still a problem - any virtual machine creates an emulated GPU, meaning it won't use your machine's native GPU. This limits the number of games and programs you can run on your virtual machine to about zero - unless all you wanted to play was MS-DOS games from the 90's. 
-
-This is something I couldn't compromise on. My work uses [Unreal Engine 4](https://www.unrealengine.com/en-US/) for game development, which requires a decent GPU to run. How do you tell a virtual machine to use a hardware GPU?
-
-One solution is [PCI(e) passthrough](https://wiki.archlinux.org/index.php/PCI_passthrough_via_OVMF). Essentially, the virtual machine uses a secondary hardware GPU and passes it to the guest, which uses it to produce near-native performance. The only problem was that my Linux machine did not have two GPUs, and I refused to spend the money to buy another GPU just for Windows programs.
-
-After much researching and testing, I found a solution which utilizes PCI(e) passthrough with only one GPU and still provides near-native performance. This is a step-by-step guide on how to configure this for a Linux machine.
+This guide is intended for somewhat-experienced Linux users (preferably in Arch-based distros) who would like to run Windows programs which require advanced GPU processing on their machine (i.e. Steam games or graphic-intensive Windows programs). I'm also assuming you know nothing about virtual machines in Linux, `Qemu`, or `PCI(e) passthrough` for that matter.
 
 ## Disclaimer <a name="disclaimer"></a>
 
 I hold no responsibility for damages done to your machine. This guide was tested on a machine with the following hardware and software:
 
-| | |
+| Hardware/Software | Specs |
 | :--- | :--- |
-| Operating System | Manjaro Linux 19.0.2 Kyria |
-| Kernel | 5.4.24-1-MANJARO |
-| Window Manager | Gnome |
-| Motherboard | Msi B450 Pro Carbon AC |
+| Operating System | Archlinux |
+| Kernel | 5.8.5-arch1-1 |
+| Window Manager | Bspwm |
+| Motherboard | MSI B450 Pro Carbon AC |
 | CPU | AMD Ryzen 9 3900X |
 | GPU | AMD Radeon RX 580 |
 | Memory | G Skill Ripjaws 2x16Gb DDR4-3200 |
 | SSD | SamsungEvo 1TB Nvme M.2 |
 
 
-With that in mind, **make sure you understand exactly what is happening before following any step**, so you don't damage your machine. 
+With that in mind, **make sure you understand exactly what is happening before following any step**, so you don't damage your machine. I'll do my best to explain thoroughly the purpose of each step.
 
-I'm also using an [Arch Linux](https://www.archlinux.org/)-based distribution, so I will be using [Pacman](https://wiki.archlinux.org/index.php/pacman) and [yay](https://github.com/Jguer/yay) to retrieve packages.
+I'll also be using an [Archlinux](https://www.archlinux.org/)-based distribution so I will be using the [Pacman](https://wiki.archlinux.org/index.php/pacman) and [Yay](https://github.com/Jguer/yay) package managers to retrieve packages. You can see how to install Archlinux by following the guide in my [dotfiles](https://github.com/bossley9/dotfiles/blob/63e5e3d22f1e51eb7cd9ce7829e87a343d61cea2/README.md#manualinstall).
 
 ## Instructions <a name="instructions"></a>
 
@@ -111,3 +109,14 @@ I'm also using an [Arch Linux](https://www.archlinux.org/)-based distribution, s
     ```
 
 **WIP**
+
+## Resources
+
+Below is a list of useful resources I found which provided insight and helped me write this guide.
+
+- [Arch Wiki: Using Identical Guest and Host GPUs](https://wiki.archlinux.org/index.php/PCI_passthrough_via_OVMF#Using_identical_guest_and_host_GPUs)
+- [Pavolelsig's Passthrough Helper for Manjaro](https://github.com/pavolelsig/passthrough_helper_manjaro)
+- [Yuri Alek's VFIO Guide](https://gitlab.com/YuriAlek/vfio)
+- [Karuri's VFIO Guide](https://gitlab.com/Karuri/vfio)
+- [Qemu-KVM Introduction](http://alexander.holbreich.org/qemu-kvm-introduction/)
+- [PCI Passthrough Via OVMF](https://wiki.archlinux.org/index.php/PCI_passthrough_via_OVMF)
